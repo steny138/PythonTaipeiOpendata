@@ -30,6 +30,7 @@ def botHook_tpebus():
         message = update.message
         text = u'您剛剛輸入的指令是：' + message.text
         bot.sendMessage(chat_id=message.chat.id, text=str(update))
+        return 'ok'
     except Exception as e:
         print e
     
