@@ -6,15 +6,15 @@ from setuptools import setup, find_packages
 long_description = open('./README.md', 'r').read()
 description = ''
 
-setup(name='ptt_crawler',
+setup(name='yc_taipeiopendata',
       version='1.0.0',
       description=description,
       long_description=long_description,
       author='YUCHEN LIU',
       author_email='steny138@gmail.com',
-      url='https://github.com/steny138/PTTCrawler',
-      packages=['ptt_crawler'],
-      package_data={'ptt_crawler': ['*.csv']},
+      url='https://github.com/steny138/PythonTaipeiOpendata',
+      packages=['yc_taipeiopendata'],
+      package_data={'yc_taipeiopendata': ['*.csv']},
       include_package_data=True,
       license='LICENSE',
       keywords=" " + \

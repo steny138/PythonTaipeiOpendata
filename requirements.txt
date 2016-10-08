@@ -8,7 +8,4 @@ ujson
 urllib3
 lxml
 wheel>=0.21
-scrapy
-leveldb
-Cython
-unqlite
+flask
