@@ -8,4 +8,5 @@ ujson
 urllib3
 lxml
 wheel>=0.21
+gunicorn
 flask
