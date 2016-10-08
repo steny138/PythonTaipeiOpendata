@@ -1,14 +1,39 @@
+# coding: utf-8
+
 import urllib3
 import gzip
 import json
 import StringIO
+import telegram
 
 from flask import Flask
+from flask import render_template, request
+
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+
 app = Flask(__name__)
+
+bot = telegram.Bot(token='288756371:AAGwm08t-JlqF161zkBj_75syb56zqd16pM')
 
 @app.route("/")
 def hello():
-    return "Hello World!2"
+    return "Hello! Welcome to yuchen's Home"
+
+# telegram yctpebusbot
+@app.route("/bot/tpebus", methods=['POST'])
+def botHook_tpebus():
+    try:
+        update = telegram.Update.de_json(request.get_json(force=True), bot)
+        print update
+        message = update.message
+        text = u'您剛剛輸入的指令是：' + message.text
+        bot.sendMessage(chat_id=message.chat.id, text=text)
+    except Exception as e:
+        print e
+    
 
 @app.route("/youbike")
 def youbike():
@@ -36,6 +61,7 @@ def send_request(url, compress = False):
         data = decompressGzip(r.read())
     else: 
         data = r.read()
+
     r.release_conn()
     return data
 
@@ -46,5 +72,7 @@ def decompressGzip(compressStr):
     decompressedStream = gzip.GzipFile(fileobj=compressedStram, mode='rb')
     result = decompressedStream.read()
     return result
+
+
 if __name__ == "__main__":
     app.run()
