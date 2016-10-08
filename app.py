@@ -13,7 +13,6 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-
 app = Flask(__name__)
 
 bot = telegram.Bot(token='288756371:AAGwm08t-JlqF161zkBj_75syb56zqd16pM')
@@ -30,7 +29,7 @@ def botHook_tpebus():
         print update
         message = update.message
         text = u'您剛剛輸入的指令是：' + message.text
-        bot.sendMessage(chat_id=message.chat.id, text=text)
+        bot.sendMessage(chat_id=message.chat.id, text=request.get_json(force=True))
     except Exception as e:
         print e
     
