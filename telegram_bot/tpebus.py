@@ -18,14 +18,15 @@ class TpeBusBot(object):
             return False
         return True
 
-        # json_keyboard = json.dumps({'keyboard': [["A button"], ["B button"]], 
-        #                     'one_time_keyboard': False, 
-        #                     'resize_keyboard': True})
+        json_keyboard = json.dumps({'keyboard': [["A button"], ["B button"]], 
+                            'one_time_keyboard': False, 
+                            'resize_keyboard': True})
 
 
     def getCmd(self, cmd, text):
+        text = u'您剛剛輸入的指令是：' + text
+
         if cmd is None or len(cmd) == 0:
-            text = u'您剛剛輸入的指令是：' + text
             self._bot.sendMessage(chat_id=self.message.chat.id, text=text)
             return
 
@@ -42,8 +43,13 @@ class TpeBusBot(object):
             pass
         elif 'btn' in cmd:
             pass
-        elif 'lovely' in cmd:
-            pass
+        elif 'test' in cmd:
+            json_keyboard = json.dumps({'keyboard': [["A button"], ["B button"]], 
+                            'one_time_keyboard': False, 
+                            'resize_keyboard': True})
+            self._bot.sendMessage(chat_id=self.message.chat.id, text=text, data=json_keyboard)
+
+
         elif 'lovely' in cmd:
             pass
         elif 'lovely' in cmd:
