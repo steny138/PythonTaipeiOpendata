@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import urllib3
+import gzip
+import json
+import StringIO
+import telegram
 
 class TpeBusBot(object):
     
@@ -17,11 +22,6 @@ class TpeBusBot(object):
             print e
             return False
         return True
-
-        json_keyboard = json.dumps({'keyboard': [["A button"], ["B button"]], 
-                            'one_time_keyboard': False, 
-                            'resize_keyboard': True})
-
 
     def getCmd(self, cmd, text):
         text = u'您剛剛輸入的指令是：' + text
@@ -44,8 +44,9 @@ class TpeBusBot(object):
         elif 'btn' in cmd:
             pass
         elif 'test' in cmd:
-            json_keyboard = json.dumps({'keyboard': [["A button"], ["B button"]], 
-                            'one_time_keyboard': False, 
+            print cmd
+            json_keyboard = json.dumps({'keyboard': [["棕9","652"], ["227", "292", "299"]], 
+                            'one_time_keyboard': True, 
                             'resize_keyboard': True})
             self._bot.sendMessage(chat_id=self.message.chat.id, text=text, reply_markup=json_keyboard)
 
