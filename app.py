@@ -115,7 +115,8 @@ def setWebhook():
     bot.setWebhook(webhook_url='https://%s/%s' % (HOST, TOKEN))
 
 if __name__ == "__main__":
-    setWebhook()
+    # local used
+    # setWebhook()
     app.run(host='127.0.0.1',
             port=PORT,
             debug=DEBUG)
