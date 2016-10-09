@@ -1,4 +1,4 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 
 import urllib3
 import gzip
@@ -8,6 +8,8 @@ import telegram
 
 from flask import Flask
 from flask import render_template, request
+
+from telegram_bot.tpebus import TpeBusBot
 
 import sys
 reload(sys)
@@ -25,11 +27,13 @@ def hello():
 @app.route("/bot/tpebus", methods=['POST'])
 def botHook_tpebus():
     try:
+        handler = TpeBusBot(bot)
+        
         update = telegram.Update.de_json(request.get_json(force=True), bot)
-        print update
         message = update.message
-        text = u'您剛剛輸入的指令是：' + message.text
-        bot.sendMessage(chat_id=message.chat.id, text=text)
+        
+        isSuccess = handler.handle_message(message)
+
         return 'ok'
     except Exception as e:
         print e
