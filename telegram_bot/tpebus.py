@@ -47,7 +47,7 @@ class TpeBusBot(object):
             json_keyboard = json.dumps({'keyboard': [["A button"], ["B button"]], 
                             'one_time_keyboard': False, 
                             'resize_keyboard': True})
-            self._bot.sendMessage(chat_id=self.message.chat.id, text=text, data=json_keyboard)
+            self._bot.sendMessage(chat_id=self.message.chat.id, text=text, reply_markup=json_keyboard)
 
 
         elif 'lovely' in cmd:
