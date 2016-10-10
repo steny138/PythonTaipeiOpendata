@@ -87,6 +87,10 @@ class TpeBusBot(object):
         elif 'q' in cmd:
             if oriText == '299':
                 self._bot.sendMessage(chat_id=self.message.chat.id, text='公車站點搜尋中, 請稍候')
+                
+                self.user.bus_route = oriText
+                self._db.session.commit() 
+
                 to = Bus()
                 busid =11411
                 stopid_goback0 =10152 # goback =0
