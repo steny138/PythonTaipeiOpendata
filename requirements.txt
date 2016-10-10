@@ -11,3 +11,6 @@ wheel>=0.21
 gunicorn
 flask
 python-telegram-bot
+psycopg2
+Flask-SQLAlchemy
+Flask-Migrate
