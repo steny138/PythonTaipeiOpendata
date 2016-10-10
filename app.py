@@ -7,7 +7,7 @@ import StringIO
 import telegram
 
 from flask import Flask
-# from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.sqlalchemy import SQLAlchemy
 from flask import render_template, request
 
 from telegram_bot.tpebus import TpeBusBot
@@ -20,10 +20,9 @@ reload(sys)
 
 sys.setdefaultencoding('utf-8')
 
-app = Flask(__name__)
-# app.config.from_object(os.environ['APP_SETTINGS'])
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# db = SQLAlchemy(app)
+# start and stop postgre on osx
+# pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start
+# pg_ctl -D /usr/local/var/postgres stop -s -m fast
 
 
 # execute command to create ssl crt and cem
@@ -32,19 +31,38 @@ app = Flask(__name__)
 # ========= CONFIG =========
 DEBUG    = False
 TOKEN    = '288756371:AAGwm08t-JlqF161zkBj_75syb56zqd16pM'
-HOST     = '57f48e9d.ngrok.io' # Same host used when ngrok response
+HOST     = '227dadcb.ngrok.io' # Same host used when ngrok response
 PORT     = 5000
+
+app = Flask(__name__)
+app.config.from_object(os.environ['APP_SETTINGS'])
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+db = SQLAlchemy(app)
+
 # CERT     = 'server.crt'
 # CERT_KEY = 'server.key'
 # context = (CERT, CERT_KEY)
-# add   ~/.bash_profile file next command
-# export DATABASE_URL="postgresql://localhost/ycapi"
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-# postgres://pbceotosmxjyvp:-2q3aYoUC2KVBmNZ4-1z44NXq0@ec2-54-163-249-150.compute-1.amazonaws.com:5432/d8pnbion83577c
 
 # ========= CONFIG =========
 
 # ========= INITIAL =========
+
+"""
+    reference from "https://realpython.com/blog/python/flask-by-example-part-2-postgres-sqlalchemy-and-alembic/"
+
+    import datamodel then execute command  "python manage.py db migrate"
+    migrate sucess and then save it execute "python manage.py db upgrade"
+    that it will mrgrate postgresql & python datamodels with "model first"
+
+    remote migrate heroku postgresql execute "heroku run python manage.py db upgrade --app ycapi"
+
+    add   ~/.bash_profile file next command
+    export DATABASE_URL="postgresql://localhost/ycapi"
+    postgres://pbceotosmxjyvp:-2q3aYoUC2KVBmNZ4-1z44NXq0@ec2-54-163-249-150.compute-1.amazonaws.com:5432/d8pnbion83577c
+
+"""
+from orm_model.user import *
 
 bot = telegram.Bot(token=TOKEN)
 
@@ -59,11 +77,11 @@ def hello():
 def launcher(token):
     if request.method == "POST":
         try:
-            handler = TpeBusBot(bot)
+            handler = TpeBusBot(bot, db)
             
             update = telegram.Update.de_json(request.get_json(force=True), bot)
             message = update.message
-            
+            print update
             isSuccess = handler.handle_message(message)
 
             return 'ok'

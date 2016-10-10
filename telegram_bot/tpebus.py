@@ -6,6 +6,8 @@ import json
 import StringIO
 import telegram
 
+import orm_model
+
 from taipei_opendata.bus import Bus
 from taipei_opendata.youbike import Youbike
 
@@ -18,13 +20,56 @@ class TpeBusBot(object):
         self.message =message
         self.cmd = cmd
         self.text = text
+        self.user = orm_model.user.User.query.filter_by(id=message.from_user.id).first()
+        self.processDb(message)
 
         try:
             result = self.getCmd(cmd, text)  
+
+            # self._db.session.delete(self.user)
+            # self._db.session.commit()
+
         except Exception as e:
             print e
             return False
         return True
+
+    def processDb(self, message):
+        if self.user is None:
+            user = orm_model.user.User(id=message.from_user.id)
+
+            user.chatid = message.chat.id
+            user.last_name = message.from_user.last_name
+            user.first_name = message.from_user.first_name
+
+            # 座標
+            if self.message.location:
+                user.lat = message.location.latitude
+                user.lng = message.location.longitude
+            
+            # 指令
+            if self.cmd != "":
+                user.cmd = self.cmd + ';';
+            
+            # 公車路線
+            # bus_route = db.Column(db.String(50), unique=False)
+
+            self._db.session.add(user)
+            self._db.session.commit()
+        else:
+            # 指令
+            if self.cmd != "":
+                if self.user.cmd == None: 
+                    self.user.cmd = ''
+
+                self.user.cmd = ("%s%s;" % (self.user.cmd, self.cmd));
+
+            # 座標
+            if self.message.location:
+                self.user.lat = message.location.latitude
+                self.user.lng = message.location.longitude
+            
+            self._db.session.commit() 
 
     def getCmd(self, cmd, text):
         oriText = text
@@ -40,7 +85,6 @@ class TpeBusBot(object):
         if 'lovely' in cmd:
             pass
         elif 'q' in cmd:
-            print oriText
             if oriText == '299':
                 self._bot.sendMessage(chat_id=self.message.chat.id, text='公車站點搜尋中, 請稍候')
                 to = Bus()
@@ -88,7 +132,6 @@ class TpeBusBot(object):
         elif 'lovely' in cmd:
             pass
 
-
     def parse_cmd_text(self, text):
         # Telegram understands UTF-8, so encode text for unicode compatibility
         text = text.encode('utf-8')
@@ -105,9 +148,10 @@ class TpeBusBot(object):
         return (cmd, text)
 
     """docstring for TpeBusBot"""
-    def __init__(self, bot):
+    def __init__(self, bot, db):
         
 
         super(TpeBusBot, self).__init__()
         self._bot = bot
+        self._db = db
         
