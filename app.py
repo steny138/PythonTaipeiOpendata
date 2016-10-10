@@ -93,7 +93,7 @@ def launcher(token):
 @app.route("/bot/tpebus", methods=['POST'])
 def botHook_tpebus():
     try:
-        handler = TpeBusBot(bot)
+        handler = TpeBusBot(bot, db)
         
         update = telegram.Update.de_json(request.get_json(force=True), bot)
         message = update.message
