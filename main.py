@@ -1,37 +1,15 @@
-import StringIO
-import urllib3
-import gzip
-import json
+# -*- coding: utf-8 -*-
+
+from taipei_opendata.bus import Bus
+from taipei_opendata.youbike import Youbike
 
 def busroute():
     try:
-        urllib3.disable_warnings()
-        url = "http://data.taipei/bus/ROUTE"
-        
-        data = send_request(url, compress=True)
-        print data #  bikeDict['retVal']
+        to = Bus()
+        print to.route()
     except Exception as e:
         print 123
         print e
-
-def send_request(url, compress = False):
-    urllib3.disable_warnings()
-    http = urllib3.PoolManager()
-    r = http.request('GET', url, preload_content=False)
-    if compress:
-        data = decompressGzip(r.read())
-    else: 
-        data = r.read()
-    r.release_conn()
-    return data
-
-def decompressGzip(compressStr):
-    compressedStram = StringIO.StringIO()
-    compressedStram.write(compressStr)
-    compressedStram.seek(0)
-    decompressedStream = gzip.GzipFile(fileobj=compressedStram, mode='rb')
-    result = decompressedStream.read()
-    return result
 
 if __name__ == "__main__":
     busroute();
