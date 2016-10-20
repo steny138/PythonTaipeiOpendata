@@ -2,23 +2,6 @@
 
 from app import db
 
-{
-      "Id": 44794,
-      "routeId": 15221,
-      "nameZh": "埤頭里",
-      "nameEn": "PitouVillage",
-      "seqNo": 125,
-      "pgp": "-1",
-      "longitude": "121.412",
-      "latitude": "25.15872",
-      "goBack": "1",
-      "address": "中山路一段179號同向",
-      "stopLocationId": 3812,
-      "showLon": "121.412",
-      "showLat": "25.15872",
-      "vector": "999"
-    },
-
 # Create our database model
 class Stop(db.Model):
     __tablename__ = "stops"
