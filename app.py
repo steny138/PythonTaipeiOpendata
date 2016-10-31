@@ -8,7 +8,7 @@ import telegram
 
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
-from flask import render_template, request
+from flask import render_template, request,jsonify
 
 from telegram_bot.tpebus import TpeBusBot
 from taipei_opendata.bus import Bus
@@ -31,7 +31,7 @@ sys.setdefaultencoding('utf-8')
 # ========= CONFIG =========
 DEBUG    = False
 TOKEN    = '288756371:AAGwm08t-JlqF161zkBj_75syb56zqd16pM'
-HOST     = '227dadcb.ngrok.io' # Same host used when ngrok response
+HOST     = '3a1492aa.ngrok.io' # Same host used when ngrok response
 PORT     = 5000
 
 app = Flask(__name__)
@@ -108,13 +108,17 @@ def botHook_tpebus():
 @app.route("/youbike")
 def youbike():
     to = Youbike()
-    return to.stops()
+    return jsonify(to.stops())
 
     
 @app.route("/bus/route")
 def bus_route():
-    to = Bus()
-    return to.route()
+    try:
+        to = Bus()
+        return jsonify(to.route())
+    except Exception as e:
+        print e
+    
 
 
 # ======= app controllers end ========
@@ -126,7 +130,7 @@ def setWebhook():
 
 if __name__ == "__main__":
     # local used
-    setWebhook()
+    # setWebhook()
     app.run(host='127.0.0.1',
             port=PORT,
             debug=DEBUG)

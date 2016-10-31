@@ -36,7 +36,7 @@ class Bus(object):
 
     def getDataDict(self, url):
         data = torequest.send_request(url, compress=True)
-        dataDict = json.loads(data)        
+        dataDict = json.loads(data)
         return dataDict
 
     """docstring for opendata"""

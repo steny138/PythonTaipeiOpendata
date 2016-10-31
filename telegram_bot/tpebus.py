@@ -15,29 +15,31 @@ class TpeBusBot(object):
     
     def handle_message(self, message):
         
-        cmd, text = self.parse_cmd_text(message.text)
+        # Analysis what the command that user type.
+        cmd, text = self.track_user_behavior_from_database(message.text)
 
         self.message =message
         self.cmd = cmd
         self.text = text
         self.user = orm_model.user.User.query.filter_by(id=message.from_user.id).first()
-        self.processDb(message)
+        self.process_database(message)
 
         try:
-            result = self.getCmd(cmd, text)  
-
-            # self._db.session.delete(self.user)
-            # self._db.session.commit()
-
+            result = self.get_command(cmd, text)  
         except Exception as e:
             print e
             return False
         return True
 
-    def processDb(self, message):
+    """
+        track user is first or continuous enter command group.
+        when user first in, it will insert a new user record preparing user send command next time.
+    """
+    def track_user_behavior_from_database(self, message):
+        # user enter the first command group, 
+        # and it will write down into database if there need second command.
         if self.user is None:
             user = orm_model.user.User(id=message.from_user.id)
-
             user.chatid = message.chat.id
             user.last_name = message.from_user.last_name
             user.first_name = message.from_user.first_name
@@ -56,6 +58,7 @@ class TpeBusBot(object):
 
             self._db.session.add(user)
             self._db.session.commit()
+
         else:
             # 指令
             if self.cmd != "":
@@ -71,7 +74,7 @@ class TpeBusBot(object):
             
             self._db.session.commit() 
 
-    def getCmd(self, cmd, text):
+    def get_command(self, cmd, text):
         oriText = text
         text = u'您剛剛輸入的指令是：' + text
 
@@ -82,7 +85,7 @@ class TpeBusBot(object):
         if oriText is None or len(oriText) == 0:
             return
         
-        if 'lovely' in cmd:
+        if '' in cmd:
             pass
         elif 'q' in cmd:
             if oriText == '299':
@@ -122,19 +125,10 @@ class TpeBusBot(object):
             #clean postgresql data with this user id
             pass
         elif 'test' in cmd:
-            print cmd
             json_keyboard = json.dumps({'keyboard': [["棕9","652"], ["227", "292", "299"]], 
                             'one_time_keyboard': True, 
                             'resize_keyboard': True})
             self._bot.sendMessage(chat_id=self.message.chat.id, text=text, reply_markup=json_keyboard)
-
-
-        elif 'lovely' in cmd:
-            pass
-        elif 'lovely' in cmd:
-            pass
-        elif 'lovely' in cmd:
-            pass
 
     def parse_cmd_text(self, text):
         # Telegram understands UTF-8, so encode text for unicode compatibility
