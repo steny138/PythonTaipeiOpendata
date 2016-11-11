@@ -12,7 +12,7 @@ class Bus(object):
 
     def stop(self, id = 0):
         try:
-            dict_estimateTime = self.getDataDict("http://data.taipei/bus/EstimateTime")
+            dict_estimateTime = self.getDataDict("http://data.taipei/bus/Stop")
 
             if id > 0:
                 dict_estimateTime["BusInfo"] = [item for item in dict_estimateTime["BusInfo"] if item["RouteID"] == id]
@@ -36,7 +36,7 @@ class Bus(object):
 
     def getDataDict(self, url):
         data = torequest.send_request(url, compress=True)
-        dataDict = json.loads(data)        
+        dataDict = json.loads(data)
         return dataDict
 
     """docstring for opendata"""

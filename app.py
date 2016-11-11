@@ -8,7 +8,7 @@ import telegram
 
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
-from flask import render_template, request
+from flask import render_template, request,jsonify
 
 from telegram_bot.tpebus import TpeBusBot
 from taipei_opendata.bus import Bus
@@ -31,7 +31,7 @@ sys.setdefaultencoding('utf-8')
 # ========= CONFIG =========
 DEBUG    = False
 TOKEN    = '288756371:AAGwm08t-JlqF161zkBj_75syb56zqd16pM'
-HOST     = '227dadcb.ngrok.io' # Same host used when ngrok response
+HOST     = 'bae4bfa3.ngrok.io' # Same host used when ngrok response
 PORT     = 5000
 
 app = Flask(__name__)
@@ -61,8 +61,15 @@ db = SQLAlchemy(app)
     export DATABASE_URL="postgresql://localhost/ycapi"
     postgres://pbceotosmxjyvp:-2q3aYoUC2KVBmNZ4-1z44NXq0@ec2-54-163-249-150.compute-1.amazonaws.com:5432/d8pnbion83577c
 
+    attentions!!
+    import class will be migrations, or not.
+
 """
 from orm_model.user import *
+from orm_model.route import *
+from orm_model.stop import *
+from orm_model.park import *
+from orm_model.youbike_stop import *
 
 bot = telegram.Bot(token=TOKEN)
 
@@ -81,7 +88,6 @@ def launcher(token):
             
             update = telegram.Update.de_json(request.get_json(force=True), bot)
             message = update.message
-            print update
             isSuccess = handler.handle_message(message)
 
             return 'ok'
@@ -108,13 +114,17 @@ def botHook_tpebus():
 @app.route("/youbike")
 def youbike():
     to = Youbike()
-    return to.stops()
+    return jsonify(to.stops())
 
     
 @app.route("/bus/route")
 def bus_route():
-    to = Bus()
-    return to.route()
+    try:
+        to = Bus()
+        return jsonify(to.route())
+    except Exception as e:
+        print e
+    
 
 
 # ======= app controllers end ========
