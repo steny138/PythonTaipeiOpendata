@@ -29,6 +29,9 @@ class Park(db.Model):
     def __repr__(self):
         return '<id {}>'.format(self.id)
 
+    def __init__(self, **entries):
+        self.__dict__.update(entries)
+
 # 剩餘車位
 class ParkSeats(db.Model):
     __tablename__ = "parkSeats"
@@ -42,3 +45,6 @@ class ParkSeats(db.Model):
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
+        
+    def __init__(self, **entries):
+        self.__dict__.update(entries)

@@ -12,7 +12,7 @@ class Bus(object):
 
     def stop(self, id = 0):
         try:
-            dict_estimateTime = self.getDataDict("http://data.taipei/bus/EstimateTime")
+            dict_estimateTime = self.getDataDict("http://data.taipei/bus/Stop")
 
             if id > 0:
                 dict_estimateTime["BusInfo"] = [item for item in dict_estimateTime["BusInfo"] if item["RouteID"] == id]

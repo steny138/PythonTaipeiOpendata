@@ -21,3 +21,6 @@ class Stop(db.Model):
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
+        
+    def __init__(self, **entries):
+        self.__dict__.update(entries)

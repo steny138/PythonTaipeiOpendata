@@ -5,7 +5,6 @@ import gzip
 import json
 import StringIO
 import telegram
-
 import orm_model
 
 from taipei_opendata.bus import Bus
@@ -14,15 +13,15 @@ from taipei_opendata.youbike import Youbike
 class TpeBusBot(object):
     
     def handle_message(self, message):
-        
         # Analysis what the command that user type.
-        cmd, text = self.track_user_behavior_from_database(message.text)
+        cmd, text = self.parse_cmd_text(message.text)
 
+        self.user = orm_model.user.User.query.filter_by(id=message.from_user.id).first()
         self.message =message
         self.cmd = cmd
         self.text = text
-        self.user = orm_model.user.User.query.filter_by(id=message.from_user.id).first()
-        self.process_database(message)
+        
+        self.track_user_behavior_from_database(message)
 
         try:
             result = self.get_command(cmd, text)  
@@ -45,7 +44,7 @@ class TpeBusBot(object):
             user.first_name = message.from_user.first_name
 
             # 座標
-            if self.message.location:
+            if message.location:
                 user.lat = message.location.latitude
                 user.lng = message.location.longitude
             
@@ -55,7 +54,6 @@ class TpeBusBot(object):
             
             # 公車路線
             # bus_route = db.Column(db.String(50), unique=False)
-
             self._db.session.add(user)
             self._db.session.commit()
 
@@ -68,7 +66,7 @@ class TpeBusBot(object):
                 self.user.cmd = ("%s%s;" % (self.user.cmd, self.cmd));
 
             # 座標
-            if self.message.location:
+            if message.location:
                 self.user.lat = message.location.latitude
                 self.user.lng = message.location.longitude
             
@@ -77,17 +75,15 @@ class TpeBusBot(object):
     def get_command(self, cmd, text):
         oriText = text
         text = u'您剛剛輸入的指令是：' + text
-
         if cmd is None or len(cmd) == 0:
-            self._bot.sendMessage(chat_id=self.message.chat.id, text=text)
+            self._bot.sendMessage(chat_id=self.message.chat.id, text=('輸入無效指令%s, 你在瞎打什麼'%(text)))
             return
 
-        if oriText is None or len(oriText) == 0:
+        if oriText is None or len(oriText) == 0 or cmd == '':
+            self._bot.sendMessage(chat_id=self.message.chat.id, text=('輸入無效指令%s-%s, 你在瞎打什麼'%(cmd, text)))
             return
-        
-        if '' in cmd:
-            pass
-        elif 'q' in cmd:
+
+        if 'q' in cmd:
             if oriText == '299':
                 self._bot.sendMessage(chat_id=self.message.chat.id, text='公車站點搜尋中, 請稍候')
                 
@@ -119,13 +115,40 @@ class TpeBusBot(object):
             pass
         elif 'map' in cmd:
             pass
-        elif 'btn' in cmd:
-            pass
-        elif 'c' in cmd:
+        elif 'clear' in cmd:
             #clean postgresql data with this user id
             pass
+        elif 'upgrade' in cmd:
+            # upgrade some base information in postgre db ex: bus route、bus stops etc..
+            if oriText == 'route':
+                self._bot.sendMessage(chat_id=self.message.chat.id, text='公車路線資料庫更新中, 請稍候')
+                busService = Bus()
+                routes = busService.route()
+                orm_model.route.Route.query.delete()
+
+                for busroute in routes["BusInfo"]:
+                    routx = orm_model.route.Route(**busroute)
+                    self._db.session.add(routx)
+
+                self._db.session.commit()
+                self._bot.sendMessage(chat_id=self.message.chat.id, text='公車路線資料庫更新完畢, 準備上路囉！')
+
+            elif oriText == 'stop':
+                self._bot.sendMessage(chat_id=self.message.chat.id, text='公車站牌資料庫更新中, 請稍候')
+                busService = Bus()
+                stops = busService.stop()
+                orm_model.stop.Stop.query.delete()
+                
+                for busstop in stops["BusInfo"]:
+                    stop = orm_model.stop.Stop(**busstop)
+                    stop.routeName = busstop["nameZh"]
+                    self._db.session.add(stop)
+
+                self._db.session.commit()
+                self._bot.sendMessage(chat_id=self.message.chat.id, text='公車站牌資料庫更新完畢, 準備上路囉！')
+
         elif 'test' in cmd:
-            json_keyboard = json.dumps({'keyboard': [["棕9","652"], ["227", "292", "299"]], 
+            json_keyboard = json.dumps({'keyboard': [["棕9","652"], ["/q 299", "/upgrade route","/upgrade stop"]], 
                             'one_time_keyboard': True, 
                             'resize_keyboard': True})
             self._bot.sendMessage(chat_id=self.message.chat.id, text=text, reply_markup=json_keyboard)
@@ -136,20 +159,21 @@ class TpeBusBot(object):
         cmd = None
         if '/' in text:
             try:
+
                 index = text.index(' ')
             except ValueError as e:
                 return (text, None)
-            cmd = text[:index]
-            text = text[index + 1:]
+            cmd = text[1:index]
+            if index > 1:
+                text = text[index + 1:]
         if cmd != None and '@' in cmd:
             cmd = cmd.replace(bot_name, '')
         return (cmd, text)
 
     """docstring for TpeBusBot"""
     def __init__(self, bot, db):
-        
-
         super(TpeBusBot, self).__init__()
         self._bot = bot
         self._db = db
+        self.user = None
         
