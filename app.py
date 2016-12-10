@@ -24,6 +24,16 @@ sys.setdefaultencoding('utf-8')
 # pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start
 # pg_ctl -D /usr/local/var/postgres stop -s -m fast
 
+"""
+    if you will check heroku database 
+    in command line key :
+
+    heroku login 
+
+    set account & password 
+
+    heroku pg:psql --app ycapi
+"""
 
 # execute command to create ssl crt and cem
 # openssl req -new -x509 -nodes -newkey rsa:1024 -keyout server.key -out server.crt -days 3650
@@ -31,7 +41,7 @@ sys.setdefaultencoding('utf-8')
 # ========= CONFIG =========
 DEBUG    = False
 TOKEN    = '288756371:AAGwm08t-JlqF161zkBj_75syb56zqd16pM'
-HOST     = 'bae4bfa3.ngrok.io' # Same host used when ngrok response
+HOST     = 'ce82c142.ngrok.io' # Same host used when ngrok response
 PORT     = 5000
 
 app = Flask(__name__)
